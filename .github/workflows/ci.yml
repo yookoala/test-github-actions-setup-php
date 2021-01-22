@@ -1,0 +1,59 @@
+name: CI Test
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  test:
+    name: CI Test (PHP ${{ matrix.php-version }})
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        php-version: ["7.0"]
+
+    steps:
+
+      - name: Setup PHP ${{ matrix.php-version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: >
+            gettext,
+            gd,
+            zip,
+          tools: composer:v2
+          ini-values: >
+            date.timezone="Etc/UTC",
+            display_startup_errors=1,
+            display_errors=1,
+            error_reporting=E_ALL & ~E_DEPRECATED,
+
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - name: Debug
+        run: php -r 'phpinfo();'
+
+      - name: Run PHP server for tests to run
+        run: |
+          # Start a PHP test server for codeception to run against
+          [ -d ./tests/_output ] || mkdir -p ./tests/_output
+          php -S 127.0.0.1:8888 -t ${{ github.workspace }}/web >/dev/null 2>./tests/_output/server_log &
+
+      - name: Install PHP vendor libraries
+        run: composer install --prefer-dist --no-interaction
+
+      - name: Run composer test
+        run: composer test
+        env:
+          TEST_ENV: codeception
+          ABSOLUTE_URL: http://127.0.0.1:8888
+
+      - name: Save Test Artifacts
+        uses: actions/upload-artifact@v2
+        if: ${{ failure() }}
+        with:
+          name: Test Artifacts (PHP ${{ matrix.php-version }})
+          path: tests/_output
+          retention-days: 5

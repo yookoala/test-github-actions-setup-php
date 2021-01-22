@@ -1,0 +1,16 @@
+{
+    "name": "yookoala/setup-php-example",
+    "authors": [
+        {
+            "name": "Koala Yeung",
+            "email": "koalay@gmail.com"
+        }
+    ],
+    "scripts": {
+        "test": "codecept run acceptance"
+    },
+    "require": {},
+    "require-dev": {
+        "codeception/codeception": "3.1.2"
+    }
+}
