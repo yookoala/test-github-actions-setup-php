@@ -39,7 +39,13 @@ jobs:
         run: |
           # Start a PHP test server for codeception to run against
           [ -d ./tests/_output ] || mkdir -p ./tests/_output
-          php -S 127.0.0.1:8888 -t ${{ github.workspace }}/web >/dev/null 2>./tests/_output/server_log &
+          php --server 127.0.0.1:8888 \
+            --docroot ${{ github.workspace }}/web \
+            --define error_reporting=E_ALL \
+            --define display_startup_errors=1 \
+            --define display_errors=1 \
+            --define error_reporting=E_ALL \
+            >/dev/null 2>./tests/_output/server_log &
 
       - name: Install PHP vendor libraries
         run: composer install --prefer-dist --no-interaction
