@@ -27,7 +27,7 @@ jobs:
             date.timezone="Etc/UTC",
             display_startup_errors=1,
             display_errors=1,
-            error_reporting=E_ALL & ~E_DEPRECATED,
+            error_reporting=E_ALL,
 
       - name: Checkout source code
         uses: actions/checkout@v2
